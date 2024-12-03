@@ -19,13 +19,6 @@
         <button type="submit">Save Results</button>
     </form>
 
-    <p>Debug - Weight: ${weight}</p>
-    <p>Debug - Height: ${height}</p>
-    <p>Debug - Age: ${age}</p>
-    <p>Debug - Gender: ${gender}</p>
-    <p>Debug - bmi: ${bmi}</p>
-    <p>Debug - bodyFatPercentage: ${bodyFatPercentage}</p>
-
     <a href="index.jsp">Go Back</a>
 </body>
 </html>
