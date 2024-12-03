@@ -7,9 +7,19 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.UUID;
 
 @WebServlet("/signup")
 public class SignupController extends HttpServlet {
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession(true);
+        String csrfToken = UUID.randomUUID().toString();
+        session.setAttribute("csrfToken", csrfToken);
+        request.setAttribute("csrfToken", csrfToken);
+        request.getRequestDispatcher("signup.jsp").forward(request, response);
+    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -34,7 +44,7 @@ public class SignupController extends HttpServlet {
         try {
             UserDAO.registerUser(username, password);
             request.setAttribute("success", "Account created successfully. Please login.");
-            request.getRequestDispatcher("signup.jsp").forward(request, response);
+            request.getRequestDispatcher("login.jsp").forward(request, response);
         } catch (Exception e) {
             request.setAttribute("error", "Username already exists. Please try a different one.");
             request.getRequestDispatcher("signup.jsp").forward(request, response);

@@ -28,59 +28,87 @@ public class UserDAO {
         }
     }
 
+
     // Method to authenticate user credentials
-    public static boolean authenticate(String username, String password) {
+    public static Object authenticate(String username, String password) {
+        Integer userId = null;
         try (Connection conn = DriverManager.getConnection(DB_URL)) {
             // Check if the database connection is successful
             if (conn == null) {
                 System.out.println("Failed to connect to the database!");
-                return false;
+                return null;
             }
 
             // Prepare and execute the SQL query
-            String query = "SELECT password FROM users WHERE username = ?";
-            PreparedStatement stmt = conn.prepareStatement(query);
-            stmt.setString(1, username);
-            ResultSet rs = stmt.executeQuery();
+            String query = "SELECT id, password FROM users WHERE username = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, username);
+                ResultSet rs = stmt.executeQuery();
 
-            if (rs.next()) {
-                String hashedPassword = rs.getString("password");
-                return BCrypt.checkpw(password, hashedPassword); // Verify the hashed password
-            } else {
-                System.out.println("User not found!");
+                if (rs.next()) {
+                    String hashedPassword = rs.getString("password");
+                    if (BCrypt.checkpw(password, hashedPassword)) {
+                        // If password matches, retrieve the user ID
+                        userId = rs.getInt("id");
+                    } else {
+                        System.out.println("Password does not match!");
+                    }
+                } else {
+                    System.out.println("User not found!");
+                }
             }
         } catch (SQLException e) {
             System.out.println("SQL Error during authentication!");
             e.printStackTrace();
         }
-        return false; // Authentication failed
+        return userId; // Return the user ID if authentication is successful, otherwise null
     }
 
     // Method to register a new user
-    public static void registerUser(String username, String password) {
+    private static boolean usernameExists(String username) throws SQLException {
+        String sql = "SELECT 1 FROM users WHERE username = ?";
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, username);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+
+    public static void registerUser(String username, String password) throws Exception {
+        if (usernameExists(username)) {
+            throw new Exception("Username already exists!");
+        }
+
         String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
 
-        try (Connection conn = DriverManager.getConnection(DB_URL)) {
-            // Check if the database connection is successful
-            if (conn == null) {
-                System.out.println("Failed to connect to the database!");
-                return;
-            }
-
-            // Insert the new user into the database
-            String query = "INSERT INTO users (username, password) VALUES (?, ?)";
-            PreparedStatement stmt = conn.prepareStatement(query);
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             PreparedStatement stmt = conn.prepareStatement("INSERT INTO users (username, password) VALUES (?, ?)")) {
             stmt.setString(1, username);
             stmt.setString(2, hashedPassword);
             stmt.executeUpdate();
             System.out.println("User registered successfully!");
         } catch (SQLException e) {
-            if (e.getMessage().contains("UNIQUE constraint failed")) {
-                System.out.println("Username already exists!");
-            } else {
-                System.out.println("SQL Error during user registration!");
-            }
+            System.out.println("SQL Error during user registration!");
             e.printStackTrace();
+            throw e; // rethrow any SQL exceptions that occur
         }
+    }
+
+    public static int getUserIdByUsername(String username) throws SQLException {
+        int userId = -1; // Default value if not found
+        String sql = "SELECT id FROM users WHERE username = ?";
+
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, username);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    userId = rs.getInt("id");
+                }
+            }
+        }
+        return userId;
     }
 }

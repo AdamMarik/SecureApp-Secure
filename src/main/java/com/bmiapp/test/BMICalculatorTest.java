@@ -1,13 +1,10 @@
 package com.bmiapp.test;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
 import java.time.Duration;
 
 public class BMICalculatorTest {
@@ -29,18 +26,28 @@ public class BMICalculatorTest {
             driver.findElement(By.id("age")).sendKeys("25");
             driver.findElement(By.id("gender")).sendKeys("male");
 
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
             // Submit the form
             driver.findElement(By.xpath("//button[text()='Calculate']")).click();
 
-            // Wait for the results
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement bmiResult = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("bmi")));
-            WebElement bodyFatResult = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("bodyFatPercentage")));
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
-            // Verify and print the results
+            WebElement bmiResult = new WebDriverWait(driver, Duration.ofSeconds(5))
+                    .until(ExpectedConditions.visibilityOfElementLocated(By.id("bmi")));
+            WebElement bodyFatResult = new WebDriverWait(driver, Duration.ofSeconds(5))
+                    .until(ExpectedConditions.visibilityOfElementLocated(By.id("bodyFatPercentage")));
+
             System.out.println("BMI: " + bmiResult.getText());
             System.out.println("Body Fat Percentage: " + bodyFatResult.getText());
-
         }
         finally {
             // Close the browser

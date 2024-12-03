@@ -26,8 +26,20 @@ public class LoginTest {
             driver.findElement(By.id("username")).sendKeys("adam");
             driver.findElement(By.id("password")).sendKeys("adam1234");
 
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
             // Submit the form
             driver.findElement(By.xpath("//button[text()='Login']")).click();
+
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
             // Wait for the results
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));

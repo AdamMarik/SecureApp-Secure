@@ -17,15 +17,18 @@ public class BMIController extends HttpServlet {
 
         try {
             // Retrieve inputs
+            int userid = SessionUtils.getLoggedInUserId(request.getSession());
             double weight = Double.parseDouble(request.getParameter("weight"));
             double height = Double.parseDouble(request.getParameter("height"));
             int age = Integer.parseInt(request.getParameter("age"));
             String gender = request.getParameter("gender");
 
-            // Debugging: Check input values
-            System.out.println("Inputs: Weight=" + weight + ", Height=" + height + ", Age=" + age + ", Gender=" + gender);
+            request.setAttribute("weight", weight);
+            request.setAttribute("height", height);
+            request.setAttribute("age", age);
+            request.setAttribute("gender", gender);
 
-            // Perform calculations
+            //Perform calculations
             double bmi = CalculatorUtil.calculateBMI(weight, height);
             double bodyFatPercentage = CalculatorUtil.calculateBodyFatPercentage(bmi, age, gender);
 
@@ -36,6 +39,9 @@ public class BMIController extends HttpServlet {
             // Set attributes for the JSP
             request.setAttribute("bmi", bmi);
             request.setAttribute("bodyFatPercentage", bodyFatPercentage);
+
+            System.out.println("Inputs: Weight=" + weight + ", Height=" + height + ", Age=" + age + ", Gender=" + gender + ", BMI=" + bmi + ", BF=" + bodyFatPercentage);
+
 
             // Debugging: Confirm attributes are set
             System.out.println("Attributes set: BMI=" + request.getAttribute("bmi") +

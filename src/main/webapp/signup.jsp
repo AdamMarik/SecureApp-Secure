@@ -1,3 +1,6 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+        pageEncoding="UTF-8"%>
+        <%@ page isELIgnored="false" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -5,7 +8,7 @@
 </head>
 <body>
     <h1>Create an Account</h1>
-        <form action="signup" method="post">
+        <form action="${pageContext.request.contextPath}/signup" method="post">
             <!-- CSRF Token -->
                     <input type="hidden" name="csrfToken" value="${csrfToken}">
 

@@ -16,9 +16,11 @@ public class LoginController extends HttpServlet {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
 
-        if (UserDAO.authenticate(username, password)) {
+        // Use the returned user ID to determine authentication success
+        Integer userId = (Integer) UserDAO.authenticate(username, password);
+        if (userId != null) {
             HttpSession session = request.getSession();
-            session.setAttribute("username", username);
+            session.setAttribute("userId", userId); // Store the user ID in session
             response.sendRedirect("index.jsp");
         } else {
             request.setAttribute("error", "Invalid credentials");
